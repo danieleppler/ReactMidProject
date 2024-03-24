@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react'
 import OtherData from './OtherData'
 import SidePanel from './SidePanel'
 
-const User = ({userData,DeleteUser,updateUser}) => {
+const User = ({userData,DeleteUser,updateUser,LastTodoIndex,SetLastTodoIndex,LasPostIndex,SetLasPostIndex,LockSidePanel,SetLockSidePanel,SidePanelLockUserId,SetSidePanelLockUserId}) => {
 
   const [AllTodosCompleted,SetAllTodosCompleted] = useState(false)
   const [onHoverContent,SetonHoverContent] = useState(false)
   const [user,SetUser] = useState()
   const [ShowSidepanel,SetShowSidepanel] = useState(false)
   
+
   useEffect(()=>{
       SetUser(userData)
   },[userData])
@@ -16,7 +17,7 @@ const User = ({userData,DeleteUser,updateUser}) => {
   useEffect(()=>{
     if(user)
     {
-      const res = user.Todos.find((todo) => !todo.completed)
+      const res = user.Todos?.find((todo) => !todo.completed)
       SetAllTodosCompleted(!res)  
     } 
   })
@@ -48,22 +49,53 @@ const User = ({userData,DeleteUser,updateUser}) => {
     SetUser({...user,address: {...user.address, zipcode: _zipcode }}) 
   }
 
+  const AddNewTodo = (title)=>{ 
+    const new_Todo = {userId:user.id,id:{LastTodoIndex},title : title,completed:false}
+    user.Todos = [...user.Todos,new_Todo]
+    SetLastTodoIndex(LastTodoIndex + 1)
+    SetUser(user)
+    handleUpdate()
+  }
+
+  const AddNewPost = (title,body)=>{ 
+    const new_Post = {userId:user.id,id:{LasPostIndex},title : title,body:body}
+    user.Posts = [...user.Posts,new_Post]
+    SetLasPostIndex(LasPostIndex + 1)
+    SetUser(user)
+    handleUpdate()
+  }
+
+  const handleIdClick = ()=>{
+    if(!LockSidePanel)
+    {
+      {SetSidePanelLockUserId(user.id)}
+      SetShowSidepanel(!ShowSidepanel)
+      {SetLockSidePanel(!LockSidePanel)}
+    }
+    else if(SidePanelLockUserId == user.id){
+      SetShowSidepanel(!ShowSidepanel)
+      {SetLockSidePanel(!LockSidePanel)}
+    }
+  }
+
   return (
     <div style={{
       border:AllTodosCompleted?"2px solid green":"2px solid red",
       textAlign:"left",
       margin:"10px",
       padding:"10px",
-      backgroundColor:ShowSidepanel?"lightsalmon":""
+      backgroundColor:ShowSidepanel?"lightsalmon":"",
       }}>
-      <span onClick={()=>SetShowSidepanel(!ShowSidepanel)} >ID : {user?.id} </span> <br />
+      <span onClick={()=>{handleIdClick()}} >ID : {user?.id} </span> <br />
       Name : <input type="text" value={user?.name} onChange={(e)=>SetUser({...user,name : e.target.value })}></input> <br />
       Email : <input type="text" value={user?.email} onChange={(e)=>SetUser({...user,email : e.target.value })}></input> <br /><br />
       <button style={{backgroundColor:"gray"}} onMouseOver={()=>{SetonHoverContent(true)}}>Other Data</button> &nbsp;&nbsp;&nbsp;<br />   
       {onHoverContent === true && <OtherData userData={user} CloseOtherData={SetonHoverContent} SetStreet={SetStreet} SetCity={SetCity} SetZipCode={SetZipCode}/>} <br />
-      <button style={{backgroundColor:"rgb(255, 255, 128)",border:"solid black 1px",borderRadius:"1px",marginLeft:"110px"}} onClick={handleUpdate} >Update </button> &nbsp;
-      <button style={{backgroundColor:"rgb(255, 255, 128)",border:"solid black 1px",borderRadius:"1px"}} onClick={handleDelete} >Delete </button><br />
-       {ShowSidepanel === true && <SidePanel userData={user} MarkTodoAsCompleted = {MarkTodoAsCompleted}/>}
+      <div style={{textAlign:"right"}}>
+      <button className='Button' onClick={handleUpdate} >Update </button> &nbsp;
+      <button  className='Button' onClick={handleDelete} >Delete </button><br />
+      </div>
+       {ShowSidepanel  && <SidePanel userData={user} MarkTodoAsCompleted = {MarkTodoAsCompleted} AddNewTodo = {AddNewTodo} AddNewPost = {AddNewPost} />}
     </div>
   )
 }

@@ -1,11 +1,31 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
+import './General.css'
 
-const SidePanel = ({userData,MarkTodoAsCompleted}) => {
+const SidePanel = ({userData,MarkTodoAsCompleted,AddNewTodo,AddNewPost}) => {
 
+const [AddTodoClicked,SetAddTodoClicked] = useState(false)
+const [AddPostClicked,SetAddPostClicked] = useState(false)
+
+const [NewPostBody,SetNewPostBody] = useState('')
+const [NewTodoTitle,SetTodoNewTitle] = useState('')
+const [NewPostTitle,SetNewPostTitle] = useState('')
+
+
+const handleAddNewTodo = ()=>{
+  {AddNewTodo(NewTodoTitle)}
+  SetAddTodoClicked(false)
+}
+
+const handleAddNewPost = ()=>{
+  {AddNewPost(NewPostTitle,NewPostBody)}
+  SetAddPostClicked(false)
+}
 
   return (
     <div style={{width:"70%",position:"absolute",right:"0px",top:"0px",width:"30%",marginRight:"350px",marginTop:"50px",marginLeft:"50px"}}>
-      Todos - User {userData.userId} <br />
+    <b>Todos - User </b>{userData.userId} 
+    {!AddTodoClicked && <div>
+      <button onClick={(e)=>{SetAddTodoClicked(!AddTodoClicked)}}>Add</button><br />  
     <div style={{border:"2px solid black"}}>
         <ul>
         {
@@ -13,13 +33,24 @@ const SidePanel = ({userData,MarkTodoAsCompleted}) => {
             return <div key={index} style={{border:"2px solid purple",margin:"20px",padding:"10px"}}>
                 <b>Title : </b>{todo.title} <br />
                 <b>Completed : </b>{todo.completed?"True":"False"}
-                {todo.completed?<></>:<button style={{position:"relative",right:"0px",bottom:"0px",left:"180px",border:"1px solid green",borderRadius:"1px",backgroundColor:"lightyellow",fontSize:"14px"}} onClick={()=>{MarkTodoAsCompleted(todo.id)}}> Mark As Completed</button>} 
+                {todo.completed?<></>:<button style={{fontSize:"12px",marginLeft:"100px"}} className='Button' onClick={()=>{MarkTodoAsCompleted(todo.id)}}> Mark As Completed</button>} 
             </div>       
             })
         }
         </ul>
-    </div>  
-      Posts - User {userData.userId}
+    </div>
+      </div>}
+
+   {AddTodoClicked && <div style={{border:"2px solid black"}}>
+    Title :    <input onChange={(e)=>{SetTodoNewTitle(e.target.value)}}></input> <br />
+    <button className='Button' onClick={()=>{SetAddTodoClicked(false)}}>Cancel</button>
+    <button className='Button' onClick={()=>handleAddNewTodo()}>Add</button>
+    </div>}
+
+
+    <b>Posts - User </b>{userData.userId}  
+        {!AddPostClicked && <div>
+          <button onClick={()=>{SetAddPostClicked(!AddPostClicked)}}>Add</button><br />
       <div style={{border:"2px solid black",padding:"10px"}}>
         <ul>
         {
@@ -31,7 +62,16 @@ const SidePanel = ({userData,MarkTodoAsCompleted}) => {
             })
         }
         </ul>
-    </div>  
+    </div>
+    </div>}
+
+    {AddPostClicked && <div style={{border:"2px solid black"}}>
+    Title :    <input onChange={(e)=>{SetNewPostTitle(e.target.value)}}></input> <br />
+    Body :  <input onChange={(e)=>{SetNewPostBody(e.target.value)}}></input>
+    <button className='Button' onClick={()=>{SetAddPostClicked(false)}}>Cancel</button>
+    <button className='Button' onClick={()=>handleAddNewPost()}>Add</button>
+    </div>}
+    
     </div>
   )
 }
